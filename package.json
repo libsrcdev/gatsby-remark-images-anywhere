@@ -1,6 +1,6 @@
 {
   "name": "@libsrcdev/gatsby-remark-images-anywhere",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Handle images with relative, absolute, remote path for gatsby-transformer-remark.",
   "keywords": [
     "gatsby",
@@ -28,7 +28,8 @@
     "dist"
   ],
   "scripts": {
-    "dev": "nodemon --watch package.json --watch src --ext js,ts,mjs,cjs,json --exec \"tsdown && yalc publish\"",
+    "yalc-publish": "yalc publish",
+    "dev": "nodemon --watch package.json --watch src --ext js,ts,mjs,cjs,json --exec \"tsdown && yalc push\"",
     "build": "tsdown",
     "lint": "eslint . --ext .ts",
     "prepare": "npm run build",

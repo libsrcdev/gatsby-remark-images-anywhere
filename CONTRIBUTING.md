@@ -19,8 +19,12 @@ This project has been tested with Node.js v25.x and npm v11.x.
 
 ## Development Setup
 
-1. Fork the repository and clone it to your local machine.
-2. Install dependencies using `npm install`.
-3. Make your changes.
-4. Commit your changes and push them to your fork.
-5. Open a pull request against the main repository.
+- Fork the repository and clone it to your local machine.
+- Install dependencies using `npm install`.
+- Setup yalc in your local machine and publish this repo (locally with yalc).
+- Create a new Gatsby host project with `gatsby-transformer-remark`.
+- Install the project with `yalc add @libsrcdev/gatsby-remark-images-anywhere`.
+- Run `yarn dev` in the Gatsby host project.
+- Whenever you change your package project, `yalc push` will update the contents at `<Gatsby host project>/.yalc/@libsrcdev/gatsby-remark-images-anywhere`. This is required because in order to locally test in your host project, the package project must resolve `gatsby-plugin-sharp` of your host project, not the library one. Otherwise it will fail with a Gatsby build-time error (https://stackoverflow.com/questions/70376012/gatsby-plugin-sharp-wasnt-setup-correctly-in-gatsby-config-js-make-sure-you-a).
+- Commit your changes and push them to your fork.
+- Open a pull request against the main repository.
