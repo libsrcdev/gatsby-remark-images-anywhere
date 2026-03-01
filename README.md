@@ -1,4 +1,4 @@
-# gatsby-remark-structured-content
+# gatsby-remark-images-anywhere
 
 This plugin processes images from markdown files that are parsed with [`gatsby-transformer-remark`](https://www.gatsbyjs.org/packages/gatsby-transformer-remark/). It supports images from multiple sources including relative paths, remote URLs, protocol-relative URLs, and CMS-generated paths.
 
