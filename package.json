@@ -1,6 +1,6 @@
 {
   "name": "@libsrcdev/gatsby-remark-images-anywhere",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Handle images with relative, absolute, remote path for gatsby-transformer-remark.",
   "keywords": [
     "gatsby",
@@ -28,38 +28,47 @@
     "dist"
   ],
   "scripts": {
-    "dev": "nodemon --watch src  --ext js,ts,mjs,cjs,json --exec \"tsdown\"",
+    "dev": "nodemon --watch package.json --watch src --ext js,ts,mjs,cjs,json --exec \"tsdown && yalc publish\"",
     "build": "tsdown",
     "lint": "eslint . --ext .ts",
-    "test": "vitest",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "test": "jest"
   },
   "dependencies": {
-    "is-relative-url": "^4.1.0",
-    "parse5": "^8.0.0",
+    "gatsby-source-filesystem": "^5.16.0",
+    "is-relative-url": "3.0.0",
+    "parse5": "5.0.0",
     "slash": "^3.0.0",
-    "unist-util-select": "^5.1.0"
+    "unist-util-select": "3.0.4"
   },
   "devDependencies": {
+    "@babel/core": "^7.29.0",
+    "@babel/preset-env": "^7.29.0",
+    "@babel/preset-typescript": "^7.28.5",
     "@swc/core": "^1.15.3",
     "@types/fs-extra": "^8.0.0",
+    "@types/jest": "^30.0.0",
     "@types/mdast": "^4.0.4",
+    "babel-preset-gatsby": "^3.16.0",
     "eslint": "^9.39.1",
-    "gatsby": "^5.15.0",
-    "gatsby-plugin-sharp": "^5.15.0",
-    "gatsby-source-filesystem": "^5.15.0",
+    "gatsby": "^5.16.1",
+    "gatsby-plugin-sharp": "^5.16.0",
     "husky": "^9.1.7",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^30.2.0",
     "mdast": "^2.3.2",
     "nodemon": "^3.1.11",
     "tap": "^14.9.2",
+    "ts-jest": "^29.4.6",
+    "ts-node-test": "^0.4.4",
     "tsdown": "^0.16.6",
     "tslib": "^2.8.1",
     "typescript": "^5.9.3"
   },
   "peerDependencies": {
     "gatsby": "^5.15.0",
-    "gatsby-source-filesystem": "^5.15.0",
-    "gatsby-plugin-sharp": "^5.15.0"
+    "gatsby-plugin-sharp": "^5.15.0",
+    "gatsby-source-filesystem": "^5.15.0"
   },
   "typings": "dist/index.d.ts",
   "prettier": {

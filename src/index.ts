@@ -9,10 +9,11 @@ import { defaultMarkup } from './default-markup';
 import { isWhitelisted } from './relative-protocol-whitelist';
 import { SUPPORT_EXTS } from './constants';
 import { buildRequestHttpHeadersWith } from './custom-http-headers/http-header-trusted-provider';
-import { resolveFullUrl, resolveRelativeUrl } from 'utils';
+import { resolveFullUrl, resolveRelativeUrl } from './utils';
 import { Reporter } from 'gatsby';
+// import { replaceNullish } from './util-replace-undefineds';
 
-let localReporter: Reporter;
+export let localReporter: Reporter;
 
 // TODO: Move to a helper library maybe @libsrcdev/js-tools?
 // function debug(obj: any) {
@@ -21,8 +22,33 @@ let localReporter: Reporter;
 //   );
 // }
 
+export function extractAllImgNodesFromMdast(mdast: RemarkNode) {
+  const imgNodes: RemarkImageNode[] = selectAll('image[url]', mdast).filter(
+    (node): node is RemarkImageNode => 'url' in node
+  );
+  const htmlImgNodes: RemarkImageNode[] = selectAll('html, jsx', mdast)
+    .filter((node: RemarkNode): node is RemarkLiteral => 'value' in node)
+    .map((node: RemarkLiteral, _, __) => toMdNode(node))
+    .filter(
+      (node: RemarkImageNode | null, _, __): node is RemarkImageNode => !!node
+    );
+
+  const allImgNodes = [...imgNodes, ...htmlImgNodes];
+
+  if (localReporter) {
+    localReporter.info(
+      `[gria] Processing ${allImgNodes.length} image(s) (${imgNodes.length} markdown, ${htmlImgNodes.length} html)`
+    );
+  }
+
+  return allImgNodes;
+}
+
 export default async function remarkImagesAnywhere(
-  {
+  gatsbyApis: Args,
+  pluginOptions: Options
+) {
+  const {
     markdownAST: mdast,
     markdownNode,
     actions,
@@ -34,9 +60,8 @@ export default async function remarkImagesAnywhere(
     reporter,
     cache,
     pathPrefix,
-  }: Args,
-  pluginOptions: Options
-) {
+  } = gatsbyApis;
+
   localReporter = reporter;
 
   const {
@@ -74,21 +99,7 @@ export default async function remarkImagesAnywhere(
     markdownNode.parent && (getNode(markdownNode.parent)?.dir as string);
   const { directory } = store.getState().program;
 
-  const imgNodes: RemarkImageNode[] = selectAll('image[url]', mdast).filter(
-    (node): node is RemarkImageNode => 'src' in node
-  );
-  const htmlImgNodes: RemarkImageNode[] = selectAll('html, jsx', mdast)
-    .filter((node: RemarkNode): node is RemarkLiteral => 'value' in node)
-    .map((node: RemarkLiteral, _, __) => toMdNode(node))
-    .filter(
-      (node: RemarkImageNode | null, _, __): node is RemarkImageNode => !!node
-    );
-
-  imgNodes.push(...htmlImgNodes);
-
-  const allImgNodes = [...imgNodes, ...htmlImgNodes];
-
-  reporter.info(`[gria] Processing ${allImgNodes.length} image(s) (${imgNodes.length} markdown, ${htmlImgNodes.length} html) using sharpMethod="${sharpMethod}"`);
+  const allImgNodes = extractAllImgNodesFromMdast(mdast);
 
   const processPromises = allImgNodes.map(async (node) => {
     if (!node.url) return;
@@ -100,7 +111,9 @@ export default async function remarkImagesAnywhere(
     // handle relative protocol domains, i.e from contentful
     // append these url with https
     if (isWhitelisted(url)) {
-      reporter.verbose(`[gria] Whitelisted protocol-relative URL, prepending https: ${url}`);
+      reporter.verbose(
+        `[gria] Whitelisted protocol-relative URL, prepending https: ${url}`
+      );
       url = `https:${url}`;
     }
 
@@ -108,7 +121,9 @@ export default async function remarkImagesAnywhere(
     const relativeImageUrl = resolveRelativeUrl(url);
 
     if (remoteFullImageUrl) {
-      reporter.verbose(`[gria] Downloading remote image: ${remoteFullImageUrl}`);
+      reporter.verbose(
+        `[gria] Downloading remote image: ${remoteFullImageUrl}`
+      );
       const buildRequestHttpHeaders =
         dangerouslyBuildRequestHttpHeaders ??
         buildRequestHttpHeadersWith(httpHeaderProviders);
@@ -149,13 +164,16 @@ export default async function remarkImagesAnywhere(
     } else {
       // We can't handle this URL
       reporter.warn(`[gria] Skipping unrecognized image URL: ${url}`);
+      return;
     }
     if (!gImgFileNode) {
       reporter.verbose(`[gria] No file node found for: ${url}`);
       return;
     }
     if (!SUPPORT_EXTS.includes(gImgFileNode.extension)) {
-      reporter.verbose(`[gria] Unsupported extension "${gImgFileNode.extension}" for: ${url}`);
+      reporter.verbose(
+        `[gria] Unsupported extension "${gImgFileNode.extension}" for: ${url}`
+      );
       return;
     }
 
