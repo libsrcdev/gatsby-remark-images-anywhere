@@ -164,7 +164,7 @@ const processLinkToOriginal: ProcessMarkup = (data, options, input) => {
     </a>`
 }
 
-export const defaultMarkup: CreateMarkup = (data, options) => {
+export const defaultMarkup: CreateMarkup = (data, options): string => {
   if (!options) throw new Error('[gatsby-remark-images-anywhere] createMarkup: No options')
   const mainImage = processMainImage.bind(null, data, options)
   const placeholder = processPlaceholder.bind(null, data, options)
